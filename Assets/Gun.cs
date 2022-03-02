@@ -15,12 +15,27 @@ public class Gun : MonoBehaviour
 
    public bool debug = false;
 
+   [Header("Audio")]
+   public AudioClip fire, getAmmo;
+    // build one for reload, and out-of-bullets, and picking up bullets
+
+
+
+   [Header("Ammo Management")]
    // private variables
    public int totalAmmo = 30;
    public int clipSize = 10;
    public int clip = 0;
 
-   bool canShoot = true;   
+
+   private AudioSource aud;
+
+
+   bool canShoot = true; 
+
+   void Start() {
+       aud = this.gameObject.GetComponent<AudioSource>();
+   }  
    
    public void Reload() {
        if (clip == clipSize) {
@@ -50,6 +65,8 @@ public class Gun : MonoBehaviour
        if(canShoot) {
         if(clip > 0) {
             if(debug) Debug.Log("Pow!");
+                aud.pitch = Random.Range(0.75f, 1.25f); // slightly vary the pitch of each gunshot
+                aud.PlayOneShot(fire); // PlayOneShot() will overlap sounds, unlike .Play()
                 clip -= 1;      
                 //create a copy of the bullet prefab
                 Rigidbody bullet = Instantiate(bulletPrefab, bulletSpawn.position, bulletSpawn.rotation);
@@ -64,6 +81,12 @@ public class Gun : MonoBehaviour
         }
        }
    }
+
+    public void GetAmmo() {
+        totalAmmo += 90;
+        aud.PlayOneShot(getAmmo);
+    }
+
     IEnumerator Cooldown() {
         canShoot = false;
         yield return new WaitForSeconds(fireRate);

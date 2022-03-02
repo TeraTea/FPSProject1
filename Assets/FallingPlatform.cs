@@ -16,6 +16,7 @@ public class FallingPlatform : MonoBehaviour
     public bool randomize = true;
 
     public Color myColor;
+    //public Color startColor, waitColor, fallColor; any color we want
     
 
     Vector3 startPosition;
@@ -32,6 +33,7 @@ public class FallingPlatform : MonoBehaviour
        rb = this.GetComponent<Rigidbody>(); 
        startPosition = this.transform.position;
        startRotation = this.transform.rotation;
+       //rend.material.color = 
        
        if(randomize) {
            //randomize position slightly
@@ -76,8 +78,10 @@ public class FallingPlatform : MonoBehaviour
 
     IEnumerator WaitToFall() {
         if(!platformIsActive){
+        //rend.material.color = yellow
         yield return new WaitForSeconds(hangTime);
         rb.isKinematic = false;
+        //rend.material.color = red
         // call another coroutine that waits 8 seconds, then resets the platform
         StartCoroutine(ResetPlatform());
         }
@@ -99,6 +103,7 @@ public class FallingPlatform : MonoBehaviour
         while(timer < 1) {
             this.transform.position = Vector3.Lerp(pointA, pointB, curve.Evaluate(timer)); // position
             this.transform.rotation = Quaternion.Lerp(rotA, rotB, curve.Evaluate(timer)); // rotation
+            //rend.material.color = Color.Lerp(waitColor, startColor, curve.Evaluate(timer))
             timer += Time.deltaTime / resetInterval;
             yield return null;
         }
