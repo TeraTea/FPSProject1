@@ -15,15 +15,20 @@ public class FallingPlatform : MonoBehaviour
 
     public bool randomize = true;
 
+    public Color myColor;
     
-    
+
     Vector3 startPosition;
+
     Rigidbody rb;
     Quaternion startRotation;
     bool platformIsActive = false;
+
     // Start is called before the first frame update
     void Start()
     {
+       myColor = new Color(0.71f, 0.45f, 0.78f);
+
        rb = this.GetComponent<Rigidbody>(); 
        startPosition = this.transform.position;
        startRotation = this.transform.rotation;
@@ -35,6 +40,8 @@ public class FallingPlatform : MonoBehaviour
 
        Randomize();
     }
+
+
 
     void Randomize() {
         if(randomize) {
@@ -52,8 +59,19 @@ public class FallingPlatform : MonoBehaviour
 
     void OnTriggerEnter(Collider other) {
         Debug.Log(other.name + " has run into us!");
+        RandomColor();
         StartCoroutine(WaitToFall());     // make the cube fall
     }
+
+    void RandomColor() {
+        if(!platformIsActive) {
+            GetComponent<Renderer>().material.color = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
+        }
+    }
+
+    void ResetColor() {
+            GetComponent<Renderer>().material.color = myColor;
+        }
 
 
     IEnumerator WaitToFall() {
@@ -90,8 +108,8 @@ public class FallingPlatform : MonoBehaviour
         this.transform.rotation = startRotation;
 
         Randomize();
-
         platformIsActive = false;
+        ResetColor();
 
     }
 }
