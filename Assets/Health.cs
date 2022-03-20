@@ -4,17 +4,28 @@ using UnityEngine;
 
 public class Health : MonoBehaviour
 {
-    public int health = 10;
-    public AudioClip death;
+    enum healthType {Player, Enemy, Object};
 
+    [SerializeField]
+    healthType hType = healthType.Object;
+
+
+    public int health = 10;
+
+    
+    public AudioClip death;
     private AudioSource aud;
 
-    [Tooltip("Check this box if this object is just an object, not an enemy.")]
-    public bool isObject = false;
+    private bool isDying = false;
+
+    //[Tooltip("Check this box if this object is just an object, not an enemy.")]
+    //public bool isObject = false;
 
     void Start() {
-        aud = this.gameObject.GetComponent<AudioSource>();
-        aud.spatialBlend = 1;       // make sure the sound is positional.
+        if(GetComponent<AudioSource>() != null) {
+            aud = this.gameObject.GetComponent<AudioSource>();
+            aud.spatialBlend = 1;       // make sure the sound is positional.
+        }
     }
 
     //todo randomize starting health
@@ -23,6 +34,16 @@ public class Health : MonoBehaviour
     //for death, use coroutine to make enemy smaller until death
     //for death, add rigidbody
     //for death, if enemy, give xp back to the player.
+
+    void Update() {
+        if(health <= 0 && !isDying) {
+            Death();
+        }
+
+        if(hType == healthType.Player) {
+            UIManager.playerHealthText.text = "Health: " + health.ToString();
+        }
+    }
 
     void OnCollisionEnter(Collision other) {        // don't forget to tag your bullet
         if(other.gameObject.CompareTag("Bullet"))
@@ -35,17 +56,12 @@ public class Health : MonoBehaviour
 
         // let the bullet define that amount
         health -= other.gameObject.GetComponent<Bullet>().damage;
-
-
-
-        if(health <= 0) {
-            Death();
-        }
     
     }
 
     void Death() {
-        if(isObject) {
+        isDying = true;
+        if(hType == healthType.Object) {
             Destroy(this.GetComponent<Collider>());     // keep it from colliding with its parts
             Destroy(this.GetComponent<Renderer>());          //make it disappear
             for(int i = 0; i < 4; i++) {
@@ -61,11 +77,13 @@ public class Health : MonoBehaviour
             }
             Destroy(this.gameObject, 1);
             aud.PlayOneShot(death);
-        } else {
+        } else if(hType == healthType.Enemy) {
             this.gameObject.AddComponent<Rigidbody>(); // make enemy fall to death
             //Destroy(this.gameObject, 5);    // destroy after 5 seconds, replaced by coroutine
             StartCoroutine(GetSmallAndDie());
 
+        } else if (hType == healthType.Player) {
+            Application.LoadLevel(0);           //restart the level.
         }
     }
 

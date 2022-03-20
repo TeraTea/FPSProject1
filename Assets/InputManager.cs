@@ -34,5 +34,36 @@ public class InputManager : MonoBehaviour
                 gun.Reload();
             }
         }
+        // restart game
+        if(keyboard.digit7Key.wasPressedThisFrame) {
+            Application.LoadLevel(0);
+        }
+        // pause game
+        if(keyboard.digit8Key.wasPressedThisFrame) {
+            if(Time.timeScale == 1) {
+                Time.timeScale = 0;
+            } else {
+                Time.timeScale = 1;
+            }
+        }
+        // quit game
+        if(keyboard.digit9Key.wasPressedThisFrame) {
+            Application.Quit(0);
+        }
+        // mute game
+        if(keyboard.digit0Key.wasPressedThisFrame) {
+            if(AudioListener.volume == 1) {
+                AudioListener.volume = 0;
+            } else {
+                AudioListener.volume = 1;
+            }
+        }
+
+        //how to use multi-key presses.
+        if(keyboard.leftCtrlKey.isPressed) {
+            if(keyboard.qKey.wasPressedThisFrame) {
+                Application.Quit();
+            }
+        }
     }
 }

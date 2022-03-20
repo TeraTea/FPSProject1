@@ -21,4 +21,8 @@ public class PlayerTrigger : MonoBehaviour
             Destroy(other.gameObject);
         }
     }
+
+    // after ontriggerenter?
+    // ontriggerstay
+    // do damage every three seconds for each enemy touching us.
 }
