@@ -63,9 +63,25 @@ public class Health : MonoBehaviour
             aud.PlayOneShot(death);
         } else {
             this.gameObject.AddComponent<Rigidbody>(); // make enemy fall to death
-            Destroy(this.gameObject, 5);    // destroy after 5 seconds
+            //Destroy(this.gameObject, 5);    // destroy after 5 seconds, replaced by coroutine
+            StartCoroutine(GetSmallAndDie());
 
         }
+    }
+
+    IEnumerator GetSmallAndDie() {
+        float time = 4;
+        float ObjStartSize = this.transform.localScale.y;
+        float objectSize = this.transform.localScale.y;
+
+        Debug.Log("Time: " + time + " ObjectSize: " + ObjStartSize);
+        Debug.Log("Making things smaller by " + (ObjStartSize / time) * Time.deltaTime);
+        while(objectSize > 0.1f) {
+            this.transform.localScale -= Vector3.one * (ObjStartSize / time) * Time.deltaTime; // change 0.01 to public variable later
+            yield return new WaitForEndOfFrame();
+            objectSize = this.transform.localScale.y;
+        }
+        Destroy(this.gameObject);
     }
 
 }
