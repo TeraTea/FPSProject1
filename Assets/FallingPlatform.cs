@@ -15,35 +15,35 @@ public class FallingPlatform : MonoBehaviour
 
     public bool randomize = true;
 
-    public Color myColor;
+    public Color startColor, waitColor, fallColor;
     //public Color startColor, waitColor, fallColor; any color we want
-    
+
+    Renderer rend;
 
     Vector3 startPosition;
-
     Rigidbody rb;
     Quaternion startRotation;
+
+
     bool platformIsActive = false;
 
     // Start is called before the first frame update
     void Start()
-    {
-       myColor = new Color(0.71f, 0.45f, 0.78f);
+    {  
+        if(randomize) {
+           //randomize position slightly
+           this.transform.Translate(Random.value - 0.5f, Random.value - 0.5f, Random.value - 0.5f);
+       }
 
        rb = this.GetComponent<Rigidbody>(); 
        startPosition = this.transform.position;
        startRotation = this.transform.rotation;
        //rend.material.color = 
-       
-       if(randomize) {
-           //randomize position slightly
-           this.transform.Translate(Random.value - 0.5f, Random.value - 0.5f, Random.value - 0.5f);
-       }
+       rend = GetComponent<Renderer>();
+       startColor = rend.material.color; 
 
        Randomize();
     }
-
-
 
     void Randomize() {
         if(randomize) {
@@ -61,27 +61,29 @@ public class FallingPlatform : MonoBehaviour
 
     void OnTriggerEnter(Collider other) {
         Debug.Log(other.name + " has run into us!");
-        RandomColor();
+        if(other.gameObject.CompareTag("Player")){
         StartCoroutine(WaitToFall());     // make the cube fall
-    }
-
-    void RandomColor() {
-        if(!platformIsActive) {
-            GetComponent<Renderer>().material.color = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
         }
     }
 
-    void ResetColor() {
-            GetComponent<Renderer>().material.color = myColor;
-        }
+//    void RandomColor() {
+//       if(!platformIsActive) {
+//           GetComponent<Renderer>().material.color = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
+//       }
+//   }
+
+//   void ResetColor() {
+//           GetComponent<Renderer>().material.color = startColor;
+//        }
 
 
     IEnumerator WaitToFall() {
         if(!platformIsActive){
-        //rend.material.color = yellow
+        platformIsActive = true;
+        rend.material.color = waitColor;
         yield return new WaitForSeconds(hangTime);
         rb.isKinematic = false;
-        //rend.material.color = red
+        rend.material.color = fallColor;
         // call another coroutine that waits 8 seconds, then resets the platform
         StartCoroutine(ResetPlatform());
         }
@@ -91,6 +93,7 @@ public class FallingPlatform : MonoBehaviour
         yield return new WaitForSeconds(resetTimer);
         //OLD WAY: this.transform.position = startPosition; 
         rb.isKinematic = true; // stop falling
+        rend.material.color = waitColor;
 
         Vector3 pointB = startPosition;
         Vector3 pointA = this.transform.position;
@@ -103,7 +106,7 @@ public class FallingPlatform : MonoBehaviour
         while(timer < 1) {
             this.transform.position = Vector3.Lerp(pointA, pointB, curve.Evaluate(timer)); // position
             this.transform.rotation = Quaternion.Lerp(rotA, rotB, curve.Evaluate(timer)); // rotation
-            //rend.material.color = Color.Lerp(waitColor, startColor, curve.Evaluate(timer))
+            rend.material.color = Color.Lerp(fallColor, startColor, curve.Evaluate(timer));
             timer += Time.deltaTime / resetInterval;
             yield return null;
         }
@@ -113,8 +116,10 @@ public class FallingPlatform : MonoBehaviour
         this.transform.rotation = startRotation;
 
         Randomize();
+        //platformIsActive = false;
+        //ResetColor();
+        rend.material.color = startColor;
         platformIsActive = false;
-        ResetColor();
 
     }
 }

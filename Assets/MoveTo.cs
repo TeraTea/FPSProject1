@@ -19,6 +19,11 @@ public class MoveTo : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        agent.destination = target.position;        
+        if(Vector3.Distance(transform.position, target.position) < 20) {
+            agent.destination = target.position;
+        }
+        else {
+            agent.destination = this.transform.position;
+        }        
     }
 }

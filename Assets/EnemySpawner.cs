@@ -19,6 +19,7 @@ public class EnemySpawner : MonoBehaviour
         while(enemiesCreated < totalDesiredEnemies) {
             SpawnEnemy();
             yield return new WaitForSeconds(spawnInterval);
+            enemiesCreated++;
         }
     }
 
